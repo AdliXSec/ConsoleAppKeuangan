@@ -1,0 +1,60 @@
+# Build artifacts
+bin/
+obj/
+
+# User-specific files
+.vscode/
+*.user
+*.rsuser
+
+# Auto-generated files
+*.suo
+*.userosscache
+*.sln.docstates
+*.log
+
+# Backup & temporary files
+*.tmp
+*.bak
+*.swp
+*~ 
+
+# IDE-specific files
+.idea/
+.vscode/
+.vs/
+
+# Rider project files
+.idea/
+*.idea/
+
+# Resharper
+_ReSharper*/
+
+# Packages
+packages/
+*.nupkg
+*.snupkg
+*.nuspec
+
+# Cache files
+*.cache
+*.template
+*.pdb
+
+# Logs
+*.log
+
+# Publish output
+publish/
+
+# Secrets
+secrets.json
+
+# DotNet
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Docker
+*.container/
