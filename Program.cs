@@ -1,132 +1,176 @@
-﻿using System;
-using System.Data;
-using System.Data.OleDb;
+﻿using MySql.Data.MySqlClient;
+using Org.BouncyCastle.Security;
+using System.Net.NetworkInformation;
+using System.Security.Cryptography;
+using System.Text;
 
-string filePath = @"database/database.xlsx";
-string connectionString = $"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={filePath};Extended Properties=\"Excel 12.0;HDR=YES;IMEX=1\"";
+string host, db, user, pass;
 
+host = "localhost";
+user = "root";
+pass = "";
+db = "csharp_keuangan";
+
+string connectionString = $"Server={host};Database={db};User Id={user};Password={pass};";
 int menu = 0;
+
+MySqlConnection connection = new MySqlConnection(connectionString);
 
 try
 {
-    while (menu != 5)
+    connection.Open();
+
+    while (menu != 6)
     {
-        ClearScreen();
-        Console.WriteLine(@"Wellcome To Mangan Bata C 
-(Manajemen Keuangan Berbasis Database dan C#)");
-        ReadUser(connectionString);
-        Menu(menu, connectionString);
+        Console.Clear();
+        InfoUser(connection);
+        Menu(menu);
+        Console.Write("Pilih Menu : ");
+        menu = Convert.ToInt32(Console.ReadLine());
+        switch (menu)
+        {
+            case 1:
+                RiwayatTransaksi(connection);
+                break;
+            case 2:
+                MenuTambah(connection);
+                break;
+            case 3:
+                break;
+            case 4:
+                break;
+            case 5:
+                break;
+            case 6:
+            default:
+                break;
+        }
     }
-    // ReadData(connectionString);
 }
-catch (Exception e)
+catch (Exception ex)
 {
-    Console.WriteLine($"terjadi kesalahan {e}");
-}
-
-// bersihkan layar
-
-static void ClearScreen()
-{
-    Console.Clear();
+    Console.WriteLine(ex.Message);
 }
 
-// tampilkan menu
-
-static void Menu(int menu, string connectionString)
+static void Menu(int menu)
 {
-    Console.Write(@"
+    Console.WriteLine(@"
 1. Riwayat Transaksi
 2. Tambah Transaksi
 3. Hapus Transaksi
-4. Edit User
-5. Keluar
+4. Cari Transaksi
+5. Edit User
+6. Keluar
+");
+
+}
+
+static void InfoUser(MySqlConnection connection)
+{
+    string query = "SELECT * FROM user";
+    MySqlCommand cmd = new MySqlCommand(query, connection);
+    MySqlDataReader reader = cmd.ExecuteReader();
+    while (reader.Read())
+    {
+        Console.WriteLine(@$"
+Hi! {reader["name_user"]}, wellcome to Mangan Bata!
+(Manajemen Keuangan Berbasis Database)
+
+    {reader["name_user"]}
+    Rp. {reader["saldo_user"]}");
+    }
+    reader.Close();
+}
+
+static void RiwayatTransaksi(MySqlConnection connection)
+{
+    Console.Clear();
+    string query = "SELECT * FROM transaksi";
+    MySqlCommand cmd = new MySqlCommand(query, connection);
+    MySqlDataReader reader = cmd.ExecuteReader();
+    Console.WriteLine(@"
+=== Riwayat Transaksi  ===");
+    while (reader.Read())
+    {
+        Console.WriteLine(@$"
+{reader["jenis_transaksi"]} Rp. {reader["saldo_transaksi"]}
+{reader["tanggal_transaksi"]}
+
+{reader["keterangan_transaksi"]}
+
+==========================");
+    }
+    reader.Close();
+    Console.WriteLine("Press any key to continue ...");
+    Console.ReadKey();
+}
+
+static void MenuTambah(MySqlConnection connection)
+{
+    Console.Clear();
+    Console.Write(@"
+1. Tambah Pemasukkan
+2. Tambah Pengeluaran
 
 Pilih Menu : ");
-    menu = Convert.ToInt32(Console.ReadLine());
-
+    int menu = Convert.ToInt32(Console.ReadLine());
     switch (menu)
     {
         case 1:
-            ReadTransaksi(connectionString);
-            Console.WriteLine("Press any key");
-            Console.ReadKey();
-            return;
+            TambahPemasukkan(connection);
+            break;
+        case 2:
+            TambahPengeluaran(connection);
+            break;
         default:
-            Console.WriteLine("Pilihan tidak valid");
             break;
     }
-
 }
 
-// baca data user
-
-static void ReadUser(string connectionString)
+static void TambahPemasukkan(MySqlConnection connection)
 {
-    string query = "SELECT * FROM [user$]";
-#pragma warning disable
-    using (OleDbConnection connection = new OleDbConnection(connectionString))
-    {
-        connection.Open();
-        using (OleDbCommand command = new OleDbCommand(query, connection))
-        using (OleDbDataReader reader = command.ExecuteReader())
-        {
-            while (reader.Read())
-            {
-                Console.WriteLine(@$"
-    {reader["NAME_KEUANGAN"]}
-    Rp. {reader["SALDO_KEUANGAN"]}");
-            }
-        }
-    }
-#pragma warning restore
+    Console.Clear();
+    DateTime now = DateTime.Now;
+    Console.Clear();
+    Console.WriteLine(@"
+=== Tambah Pemasukkan ===
+");
+    Console.Write("Jumlah : ");
+    int jumlah = Convert.ToInt32(Console.ReadLine());
+    Console.Write("Keterangan : ");
+    string? keterangan = Console.ReadLine();
+    string query = $"INSERT INTO transaksi (jenis_transaksi, saldo_transaksi, keterangan_transaksi, tanggal_transaksi, email_user) VALUES ('+ (pemasukkan)', '{jumlah}', '{keterangan}', '{now}', 'adli@gmail.com')";
+    string queryUpdateUser = $"UPDATE user SET saldo_user = saldo_user + {jumlah} WHERE email_user = 'adli@gmail.com'";
+    MySqlCommand updateUser = new MySqlCommand(queryUpdateUser, connection);
+    updateUser.ExecuteNonQuery();
+    MySqlCommand cmd = new MySqlCommand(query, connection);
+    cmd.ExecuteNonQuery();
+    Console.WriteLine(@"Data Berhasil Di Tambah
+    
+Press any key to continue ...");
+    Console.ReadKey();
 }
 
-// baca riwayat transakssi
-
-static void ReadTransaksi(string connectionString)
+static void TambahPengeluaran(MySqlConnection connection)
 {
-    string query2 = "SELECT * FROM [transaksi$]";
-#pragma warning disable CA1416 // Validate platform compatibility
-
-    using (OleDbConnection connection = new OleDbConnection(connectionString))
-    {
-        connection.Open();
-        using (OleDbCommand command2 = new OleDbCommand(query2, connection))
-        using (OleDbDataReader reader2 = command2.ExecuteReader())
-        {
-            Console.WriteLine(@"
-==== RIWAYAT TRANSAKSI ====
-                ");
-            while (reader2.Read())
-            {
-                ClearScreen();
-                Console.WriteLine(@$"
-Jenis : {reader2["JENIS_TRANSAKSI"]}
-Total: {reader2["SALDO_TRANSAKSI"]}
-
-{reader2["KETERANGAN_TRANSAKSI"]}
-
-{reader2["TANGGAL_TRANSAKSI"]}");
-            }
-            Console.WriteLine(@"
-===========================
-                ");
-        }
-    }
-#pragma warning restore CA1416 // Validate platform compatibility
+    Console.Clear();
+    DateTime now = DateTime.Now;
+    Console.Clear();
+    Console.WriteLine(@"
+=== Tambah Pemasukkan ===
+");
+    Console.Write("Jumlah : ");
+    int jumlah = Convert.ToInt32(Console.ReadLine());
+    Console.Write("Keterangan : ");
+    string? keterangan = Console.ReadLine();
+    string query = $"INSERT INTO transaksi (jenis_transaksi, saldo_transaksi, keterangan_transaksi, tanggal_transaksi, email_user) VALUES ('- (pengeluaran)', '{jumlah}', '{keterangan}', '{now}', 'adli@gmail.com')";
+    string queryUpdateUser = $"UPDATE user SET saldo_user = saldo_user - {jumlah} WHERE email_user = 'adli@gmail.com'";
+    MySqlCommand updateUser = new MySqlCommand(queryUpdateUser, connection);
+    updateUser.ExecuteNonQuery();
+    MySqlCommand cmd = new MySqlCommand(query, connection);
+    cmd.ExecuteNonQuery();
+    Console.WriteLine(@"Data Berhasil Di Tambah
+    
+Press any key to continue ...");
+    Console.ReadKey();
 }
-
-// static void ExecuteNonQuery(string query, string connectionString)
-// {
-// #pragma warning disable
-//     using (OleDbConnection connection = new OleDbConnection(connectionString))
-//     {
-//         connection.Open();
-//         using (OleDbCommand command = new OleDbCommand(query, connection))
-//         {
-//             command.ExecuteNonQuery();
-//         }
-//     }
-// #pragma warning restore
-// }
