@@ -36,8 +36,10 @@ try
                 MenuTambah(connection);
                 break;
             case 3:
+                HapusTransaksi(connection);
                 break;
             case 4:
+                CariTransaksi(connection);
                 break;
             case 5:
                 break;
@@ -98,6 +100,7 @@ static void RiwayatTransaksi(MySqlConnection connection)
 
 {reader["keterangan_transaksi"]}
 
+ID : {reader["id_transaksi"]}
 ==========================");
     }
     reader.Close();
@@ -172,5 +175,48 @@ static void TambahPengeluaran(MySqlConnection connection)
     Console.WriteLine(@"Data Berhasil Di Tambah
     
 Press any key to continue ...");
+    Console.ReadKey();
+}
+
+static void HapusTransaksi(MySqlConnection connection)
+{
+    Console.Clear();
+    Console.WriteLine(@"Hapus Transaksi
+");
+    Console.Write("ID : ");
+    int id = Convert.ToInt32(Console.ReadLine());
+    string query = $"DELETE FROM transaksi WHERE id_transaksi = {id}";
+    MySqlCommand cmd = new MySqlCommand(query, connection);
+    cmd.ExecuteNonQuery();
+    Console.WriteLine("Data Berhasil Di Hapus");
+    Console.WriteLine("Press any key to continue ...");
+    Console.ReadKey();
+}
+
+static void CariTransaksi(MySqlConnection connection)
+{
+    Console.Clear();
+    Console.WriteLine(@"Cari Transaksi
+");
+    Console.Write("cari : ");
+    string? cari = Console.ReadLine();
+    string query = $"SELECT * FROM transaksi WHERE keterangan_transaksi LIKE '%{cari}%'";
+    MySqlCommand cmd = new MySqlCommand(query, connection);
+    MySqlDataReader reader = cmd.ExecuteReader();
+    Console.WriteLine(@$"
+=== Hasil Pencarian {cari}  ===");
+    while (reader.Read())
+    {
+        Console.WriteLine(@$"
+{reader["jenis_transaksi"]} Rp. {reader["saldo_transaksi"]}
+{reader["tanggal_transaksi"]}
+
+{reader["keterangan_transaksi"]}
+
+ID : {reader["id_transaksi"]}
+==========================");
+    }
+    reader.Close();
+    Console.WriteLine("Press any key to continue ...");
     Console.ReadKey();
 }
