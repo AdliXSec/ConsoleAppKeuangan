@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualBasic;
 using MySql.Data.MySqlClient;
 using Org.BouncyCastle.Asn1.Cmp;
+using Org.BouncyCastle.Asn1.Misc;
 using Org.BouncyCastle.Security;
 using System.Net.NetworkInformation;
 using System.Security.Cryptography;
@@ -42,52 +43,69 @@ try
     while (menu != 6)
     {
         Console.Clear();
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine(@$"
-Hi!, wellcome to Mangan Bata!
-(Manajemen Keuangan Berbasis Database)
-
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣤⣶⣿⣿⣷⣤⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⣀⣴⣾⣿⣿⣿⠋⣉⣉⠙⣿⣿⣿⣷⣦⣀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⢀⣤⣶⣿⣿⣿⣿⣿⣿⣿⠀⣿⣿⠀⣿⣿⣿⣿⣿⣿⣿⣶⣤⡀⠀⠀⠀
-⠀⠀⠀⣤⣤⣤⣤⣤⡄⠀⠀⠀⢀⣠⣿⣿⣤⣤⣄⡀⠀⢠⣤⣤⣤⣤⣤⠀⠀⠀
-⠀⠀⠀⠀⣿⣿⣿⠀⠀⠀⢀⣴⣿⡿⠛⠛⠛⠛⠛⠇⠀⠀⠀⣿⣿⣿⠀⠀⠀⠀
-⠀⠀⠀⠀⣿⣿⣿⠀⠀⠀⣸⣿⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣿⠀⠀⠀⠀
-⠀⠀⠀⠀⣿⣿⣿⠀⠀⠀⣿⣿⠀⠀⠀⠀⢠⣤⣤⣤⠀⠀⠀⣿⣿⣿⠀⠀⠀⠀
-⠀⠀⠀⠀⣿⣿⣿⠀⠀⠀⢹⣿⣆⠀⠀⠀⠀⠀⢸⣿⠀⠀⠀⣿⣿⣿⠀⠀⠀⠀
-⠀⠀⠀⠀⣿⣿⣿⠀⠀⠀⠀⠻⣿⣷⣤⣤⣤⣤⣾⣿⠀⠀⠀⣿⣿⣿⠀⠀⠀⠀
-⠀⠀⠀⠀⣿⣿⣿⠀⠀⠀⠀⠀⠈⠙⣿⣿⠛⠛⠉⠁⠀⠀⠀⣿⣿⣿⠀⠀⠀⠀
-⠀⠀⠀⠛⠛⠛⠛⠛⠃⠀⠀⠀⠀⠀⣿⣿⠀⠀⠀⠀⠀⠘⠛⠛⠛⠛⠛⠀⠀⠀
-⠀⠀⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠀⠉⠉⠀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⠀⠀
-⠀⢰⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⡆⠀
-⠀⠈⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠁⠀
-
-");
-        InfoUser(connection);
-        Menu(menu);
-        Console.Write("Pilih Menu : ");
-        menu = Convert.ToInt32(Console.ReadLine());
-        switch (menu)
+        HeadLogo();
+        string? id = Login(connectionString);
+        // Console.WriteLine(id);
+        if (id != "0")
         {
-            case 1:
-                RiwayatTransaksi(connection);
-                break;
-            case 2:
-                MenuTambah(connection);
-                break;
-            case 3:
-                HapusTransaksi(connection);
-                break;
-            case 4:
-                CariTransaksi(connection);
-                break;
-            case 5:
-                break;
-            case 6:
-            default:
-                break;
+            Console.Clear();
+            HeadLogo();
+            InfoUser(connection);
+            Menu(menu);
+            Console.Write("Pilih Menu : ");
+            menu = Convert.ToInt32(Console.ReadLine());
+            switch (menu)
+            {
+                case 1:
+                    RiwayatTransaksi(connection);
+                    break;
+                case 2:
+                    MenuTambah(connection);
+                    break;
+                case 3:
+                    HapusTransaksi(connection);
+                    break;
+                case 4:
+                    CariTransaksi(connection);
+                    break;
+                case 5:
+                    break;
+                case 6:
+                default:
+                    break;
+            }
         }
+        else if (id == "0")
+        {
+            Console.WriteLine("Login Gagal");
+            Console.WriteLine("Press any key to continue ...");
+            Console.ReadKey();
+            continue;
+        }
+        // InfoUser(connection);
+        // Menu(menu);
+        // Console.Write("Pilih Menu : ");
+        // menu = Convert.ToInt32(Console.ReadLine());
+        // switch (menu)
+        // {
+        //     case 1:
+        //         RiwayatTransaksi(connection);
+        //         break;
+        //     case 2:
+        //         MenuTambah(connection);
+        //         break;
+        //     case 3:
+        //         HapusTransaksi(connection);
+        //         break;
+        //     case 4:
+        //         CariTransaksi(connection);
+        //         break;
+        //     case 5:
+        //         break;
+        //     case 6:
+        //     default:
+        //         break;
+        // }
     }
 }
 catch (Exception ex)
@@ -97,6 +115,31 @@ catch (Exception ex)
 finally
 {
     connection.Close();
+}
+
+static void HeadLogo()
+{
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine(@$"
+Hi!, wellcome to Mangan Bata!
+(Manajemen Keuangan Berbasis Database)
+
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⢯⠙⠩⠀⡇⠊⠽⢖⠆⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠱⣠⠀⢁⣄⠔⠁⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⣷⣶⣾⣾⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⢀⡔⠙⠈⢱⡟⣧⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⡠⠊⠀⠀⣀⡀⠀⠘⠕⢄⠀⠀⠀⠀⠀
+⠀⠀⠀⢀⠞⠀⠀⢀⣠⣿⣧⣀⠀⠀⢄⠱⡀⠀⠀⠀
+⠀⠀⡰⠃⠀⠀⢠⣿⠿⣿⡟⢿⣷⡄⠀⠑⢜⢆⠀⠀
+⠀⢰⠁⠀⠀⠀⠸⣿⣦⣿⡇⠀⠛⠋⠀⠨⡐⢍⢆⠀
+⠀⡇⠀⠀⠀⠀⠀⠙⠻⣿⣿⣿⣦⡀⠀⢀⠨⡒⠙⡄
+⢠⠁⡀⠀⠀⠀⣤⡀⠀⣿⡇⢈⣿⡷⠀⠠⢕⠢⠁⡇
+⠸⠀⡕⠀⠀⠀⢻⣿⣶⣿⣷⣾⡿⠁⠀⠨⣐⠨⢀⠃
+⠀⠣⣩⠘⠀⠀⠀⠈⠙⣿⡏⠁⠀⢀⠠⢁⡂⢉⠎⠀
+⠀⠀⠈⠓⠬⢀⣀⠀⠀⠈⠀⠀⠀⢐⣬⠴⠒⠁⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠈⠉⠉⠉⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀
+");
 }
 
 static void Menu(int menu)
@@ -186,7 +229,7 @@ static void TambahPemasukkan(MySqlConnection connection)
 === Tambah Pemasukkan ===
 ");
     Console.Write("Jumlah : ");
-    int jumlah = Convert.ToInt32(Console.ReadLine());
+    string? jumlah = Console.ReadLine();
     Console.Write("Keterangan : ");
     string? keterangan = Console.ReadLine();
     string query = $"INSERT INTO transaksi (jenis_transaksi, saldo_transaksi, keterangan_transaksi, tanggal_transaksi, email_user) VALUES ('+ (pemasukkan)', '{jumlah}', '{keterangan}', '{now}', 'adli@gmail.com')";
@@ -210,7 +253,7 @@ static void TambahPengeluaran(MySqlConnection connection)
 === Tambah Pengeluaran ===
 ");
     Console.Write("Jumlah : ");
-    int jumlah = Convert.ToInt32(Console.ReadLine());
+    string? jumlah = Console.ReadLine();
     Console.Write("Keterangan : ");
     string? keterangan = Console.ReadLine();
     string query = $"INSERT INTO transaksi (jenis_transaksi, saldo_transaksi, keterangan_transaksi, tanggal_transaksi, email_user) VALUES ('- (pengeluaran)', '{jumlah}', '{keterangan}', '{now}', 'adli@gmail.com')";
@@ -268,9 +311,13 @@ ID : {reader["id_transaksi"]}
     Console.ReadKey();
 }
 
-static void Login(MySqlConnection connection)
+static string Login(string connectionString)
 {
-    Console.Clear();
+    Console.ForegroundColor = ConsoleColor.White;
+    Console.WriteLine(@"=== Login User ===
+    ");
+    MySqlConnection connection = new MySqlConnection(connectionString);
+    connection.Open();
     Console.Write("Email : ");
     string? email = Console.ReadLine();
     Console.Write("Password : ");
@@ -281,11 +328,13 @@ static void Login(MySqlConnection connection)
     if (reader.Read())
     {
         string? id = reader["id_user"].ToString();
+        return id;
     }
-    else
-    {
-        Console.WriteLine("Login Gagal");
-        Console.WriteLine("Press any key to continue ...");
-        Console.ReadKey();
-    }
+    return "0";
+    // else
+    // {
+    //     Console.WriteLine("Login Gagal");
+    //     Console.WriteLine("Press any key to continue ...");
+    //     Console.ReadKey();
+    // }
 }
