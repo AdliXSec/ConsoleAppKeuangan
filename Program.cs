@@ -1,4 +1,6 @@
-﻿using MySql.Data.MySqlClient;
+﻿using Microsoft.VisualBasic;
+using MySql.Data.MySqlClient;
+using Org.BouncyCastle.Asn1.Cmp;
 using Org.BouncyCastle.Security;
 using System.Net.NetworkInformation;
 using System.Security.Cryptography;
@@ -16,6 +18,23 @@ int menu = 0;
 
 MySqlConnection connection = new MySqlConnection(connectionString);
 
+// red = ConsoleColor.Red;
+// green = ConsoleColor.Green;
+// yellow = ConsoleColor.Yellow;
+// blue = ConsoleColor.Blue;
+// magenta = ConsoleColor.Magenta;
+// cyan = ConsoleColor.Cyan;
+// white = ConsoleColor.White;
+// black = ConsoleColor.Black;
+// darkBlue = ConsoleColor.DarkBlue;
+// darkGreen = ConsoleColor.DarkGreen;
+// darkCyan = ConsoleColor.DarkCyan;
+// darkRed = ConsoleColor.DarkRed;
+// darkMagenta = ConsoleColor.DarkMagenta;
+// darkYellow = ConsoleColor.DarkYellow;
+// gray = ConsoleColor.Gray;
+// darkGray = ConsoleColor.DarkGray;
+
 try
 {
     connection.Open();
@@ -23,6 +42,28 @@ try
     while (menu != 6)
     {
         Console.Clear();
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.WriteLine(@$"
+Hi!, wellcome to Mangan Bata!
+(Manajemen Keuangan Berbasis Database)
+
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣤⣶⣿⣿⣷⣤⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⣀⣴⣾⣿⣿⣿⠋⣉⣉⠙⣿⣿⣿⣷⣦⣀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⢀⣤⣶⣿⣿⣿⣿⣿⣿⣿⠀⣿⣿⠀⣿⣿⣿⣿⣿⣿⣿⣶⣤⡀⠀⠀⠀
+⠀⠀⠀⣤⣤⣤⣤⣤⡄⠀⠀⠀⢀⣠⣿⣿⣤⣤⣄⡀⠀⢠⣤⣤⣤⣤⣤⠀⠀⠀
+⠀⠀⠀⠀⣿⣿⣿⠀⠀⠀⢀⣴⣿⡿⠛⠛⠛⠛⠛⠇⠀⠀⠀⣿⣿⣿⠀⠀⠀⠀
+⠀⠀⠀⠀⣿⣿⣿⠀⠀⠀⣸⣿⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣿⠀⠀⠀⠀
+⠀⠀⠀⠀⣿⣿⣿⠀⠀⠀⣿⣿⠀⠀⠀⠀⢠⣤⣤⣤⠀⠀⠀⣿⣿⣿⠀⠀⠀⠀
+⠀⠀⠀⠀⣿⣿⣿⠀⠀⠀⢹⣿⣆⠀⠀⠀⠀⠀⢸⣿⠀⠀⠀⣿⣿⣿⠀⠀⠀⠀
+⠀⠀⠀⠀⣿⣿⣿⠀⠀⠀⠀⠻⣿⣷⣤⣤⣤⣤⣾⣿⠀⠀⠀⣿⣿⣿⠀⠀⠀⠀
+⠀⠀⠀⠀⣿⣿⣿⠀⠀⠀⠀⠀⠈⠙⣿⣿⠛⠛⠉⠁⠀⠀⠀⣿⣿⣿⠀⠀⠀⠀
+⠀⠀⠀⠛⠛⠛⠛⠛⠃⠀⠀⠀⠀⠀⣿⣿⠀⠀⠀⠀⠀⠘⠛⠛⠛⠛⠛⠀⠀⠀
+⠀⠀⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠀⠉⠉⠀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⠀⠀
+⠀⢰⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⡆⠀
+⠀⠈⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠁⠀
+
+");
         InfoUser(connection);
         Menu(menu);
         Console.Write("Pilih Menu : ");
@@ -53,10 +94,15 @@ catch (Exception ex)
 {
     Console.WriteLine(ex.Message);
 }
+finally
+{
+    connection.Close();
+}
 
 static void Menu(int menu)
 {
-    Console.WriteLine(@"
+    Console.ForegroundColor = ConsoleColor.White;
+    Console.WriteLine(@$"
 1. Riwayat Transaksi
 2. Tambah Transaksi
 3. Hapus Transaksi
@@ -72,15 +118,16 @@ static void InfoUser(MySqlConnection connection)
     string query = "SELECT * FROM user";
     MySqlCommand cmd = new MySqlCommand(query, connection);
     MySqlDataReader reader = cmd.ExecuteReader();
-    while (reader.Read())
-    {
-        Console.WriteLine(@$"
-Hi! {reader["name_user"]}, wellcome to Mangan Bata!
-(Manajemen Keuangan Berbasis Database)
+    Console.ForegroundColor = ConsoleColor.White;
+    reader.Read();
 
-    {reader["name_user"]}
-    Rp. {reader["saldo_user"]}");
-    }
+    Console.ForegroundColor = ConsoleColor.Blue;
+    Console.WriteLine(@$"   {reader["name_user"]}");
+    Console.ForegroundColor = ConsoleColor.White;
+    Console.Write("   Rp. ");
+    Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine(@$"{reader["saldo_user"]}");
+
     reader.Close();
 }
 
@@ -160,7 +207,7 @@ static void TambahPengeluaran(MySqlConnection connection)
     DateTime now = DateTime.Now;
     Console.Clear();
     Console.WriteLine(@"
-=== Tambah Pemasukkan ===
+=== Tambah Pengeluaran ===
 ");
     Console.Write("Jumlah : ");
     int jumlah = Convert.ToInt32(Console.ReadLine());
@@ -219,4 +266,26 @@ ID : {reader["id_transaksi"]}
     reader.Close();
     Console.WriteLine("Press any key to continue ...");
     Console.ReadKey();
+}
+
+static void Login(MySqlConnection connection)
+{
+    Console.Clear();
+    Console.Write("Email : ");
+    string? email = Console.ReadLine();
+    Console.Write("Password : ");
+    string? password = Console.ReadLine();
+    string query = $"SELECT * FROM user WHERE email_user = '{email}' AND password_user = '{password}'";
+    MySqlCommand cmd = new MySqlCommand(query, connection);
+    MySqlDataReader reader = cmd.ExecuteReader();
+    if (reader.Read())
+    {
+        string? id = reader["id_user"].ToString();
+    }
+    else
+    {
+        Console.WriteLine("Login Gagal");
+        Console.WriteLine("Press any key to continue ...");
+        Console.ReadKey();
+    }
 }
