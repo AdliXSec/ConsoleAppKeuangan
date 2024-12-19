@@ -1,8 +1,11 @@
-﻿// Naufal Syahruradli (102062400103)
-// Aldi Rachmatdianto (102062400069)
-// Veny Etika Dzakiyyah (102062400117)
-// Ida Bagus Giri Krisnabhawa (102062400117)
-// Bagus Ardin Prayoga (102062400064)
+﻿// Kelas: IS-07-01
+// Kelompok: 06 
+// Anggota:
+// 1. Naufal Syahruradli (102062400103)
+// 2. Aldi Rachmatdianto (102062400069)
+// 3. Veny Etika Dzakiyyah (102062400117)
+// 4. Ida Bagus Giri Krisnabhawa (102062400117)
+// 5. Bagus Ardin Prayoga (102062400064)
 
 using Microsoft.VisualBasic;
 using MySql.Data.MySqlClient;
