@@ -1,4 +1,10 @@
-﻿using Microsoft.VisualBasic;
+﻿// Naufal Syahruradli (102062400103)
+// Aldi Rachmatdianto (102062400069)
+// Veny Etika Dzakiyyah (102062400117)
+// Ida Bagus Giri Krisnabhawa (102062400117)
+// Bagus Ardin Prayoga (102062400064)
+
+using Microsoft.VisualBasic;
 using MySql.Data.MySqlClient;
 using Org.BouncyCastle.Asn1.Cmp;
 using Org.BouncyCastle.Asn1.Misc;
@@ -44,38 +50,41 @@ try
     {
         Console.Clear();
         HeadLogo();
-        string? id = Login(connectionString);
-        // Console.WriteLine(id);
-        if (id != "0")
+        string? mail = Login(connectionString);
+        // Console.WriteLine(mail);
+        if (mail != "0")
         {
-            Console.Clear();
-            HeadLogo();
-            InfoUser(connection);
-            Menu(menu);
-            Console.Write("Pilih Menu : ");
-            menu = Convert.ToInt32(Console.ReadLine());
-            switch (menu)
+            while (menu != 6)
             {
-                case 1:
-                    RiwayatTransaksi(connection);
-                    break;
-                case 2:
-                    MenuTambah(connection);
-                    break;
-                case 3:
-                    HapusTransaksi(connection);
-                    break;
-                case 4:
-                    CariTransaksi(connection);
-                    break;
-                case 5:
-                    break;
-                case 6:
-                default:
-                    break;
+                Console.Clear();
+                HeadLogo();
+                InfoUser(connection, mail);
+                Menu(menu);
+                Console.Write("Pilih Menu : ");
+                menu = Convert.ToInt32(Console.ReadLine());
+                switch (menu)
+                {
+                    case 1:
+                        RiwayatTransaksi(connection, mail);
+                        break;
+                    case 2:
+                        MenuTambah(connection);
+                        break;
+                    case 3:
+                        HapusTransaksi(connection);
+                        break;
+                    case 4:
+                        CariTransaksi(connection);
+                        break;
+                    case 5:
+                        break;
+                    case 6:
+                    default:
+                        break;
+                }
             }
         }
-        else if (id == "0")
+        else if (mail == "0")
         {
             Console.WriteLine("Login Gagal");
             Console.WriteLine("Press any key to continue ...");
@@ -142,6 +151,30 @@ Hi!, wellcome to Mangan Bata!
 ");
 }
 
+static void ProfileLogo()
+{
+    Console.WriteLine(@"
+======= Your Profile =======
+
+    .------\ /------.
+    |       -       |
+    |               |
+    |               |
+    |               |
+ _______________________
+ ===========.===========
+   / ~~~~~     ~~~~~ \
+  /|     |     |     |\
+  W   ---  / \  ---   W
+  \.      |o o|      ./
+   |                 |
+   \    #########    /
+    \  ## ----- ##  /
+     \##         ##/
+      \_____v_____/    
+");
+}
+
 static void Menu(int menu)
 {
     Console.ForegroundColor = ConsoleColor.White;
@@ -150,15 +183,15 @@ static void Menu(int menu)
 2. Tambah Transaksi
 3. Hapus Transaksi
 4. Cari Transaksi
-5. Edit User
+5. Profile
 6. Keluar
 ");
 
 }
 
-static void InfoUser(MySqlConnection connection)
+static void InfoUser(MySqlConnection connection, string mail)
 {
-    string query = "SELECT * FROM user";
+    string query = $"SELECT * FROM user WHERE email_user = '{mail}'";
     MySqlCommand cmd = new MySqlCommand(query, connection);
     MySqlDataReader reader = cmd.ExecuteReader();
     Console.ForegroundColor = ConsoleColor.White;
@@ -174,25 +207,40 @@ static void InfoUser(MySqlConnection connection)
     reader.Close();
 }
 
-static void RiwayatTransaksi(MySqlConnection connection)
+static void RiwayatTransaksi(MySqlConnection connection, string mail)
 {
     Console.Clear();
-    string query = "SELECT * FROM transaksi";
+    string query = $"SELECT * FROM transaksi WHERE email_user = '{mail}'";
     MySqlCommand cmd = new MySqlCommand(query, connection);
     MySqlDataReader reader = cmd.ExecuteReader();
     Console.WriteLine(@"
 === Riwayat Transaksi  ===");
     while (reader.Read())
     {
+        if (reader["jenis_transaksi"].ToString() == "+ (pemasukkan)")
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+        }
+        else
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+        }
+        Console.Write(@$"
+{reader["jenis_transaksi"]}");
+        Console.ForegroundColor = ConsoleColor.White;
+        Console.WriteLine(@$" Rp. {reader["saldo_transaksi"]}
+{reader["tanggal_transaksi"]}");
+
+        Console.ForegroundColor = ConsoleColor.Blue;
         Console.WriteLine(@$"
-{reader["jenis_transaksi"]} Rp. {reader["saldo_transaksi"]}
-{reader["tanggal_transaksi"]}
+    {reader["keterangan_transaksi"]}");
 
-{reader["keterangan_transaksi"]}
-
-ID : {reader["id_transaksi"]}
+        Console.ForegroundColor = ConsoleColor.White;
+        Console.WriteLine(@$"
+ID: {reader["id_transaksi"]}
 ==========================");
     }
+    Console.ForegroundColor = ConsoleColor.White;
     reader.Close();
     Console.WriteLine("Press any key to continue ...");
     Console.ReadKey();
@@ -204,6 +252,7 @@ static void MenuTambah(MySqlConnection connection)
     Console.Write(@"
 1. Tambah Pemasukkan
 2. Tambah Pengeluaran
+3. Kembali
 
 Pilih Menu : ");
     int menu = Convert.ToInt32(Console.ReadLine());
@@ -215,6 +264,7 @@ Pilih Menu : ");
         case 2:
             TambahPengeluaran(connection);
             break;
+        case 3:
         default:
             break;
     }
@@ -327,8 +377,8 @@ static string Login(string connectionString)
     MySqlDataReader reader = cmd.ExecuteReader();
     if (reader.Read())
     {
-        string? id = reader["id_user"].ToString();
-        return id;
+        string mail = "" + reader["email_user"];
+        return mail;
     }
     return "0";
     // else
