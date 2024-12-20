@@ -83,6 +83,8 @@ try
                         Profile(connection, connectionString, mail);
                         break;
                     case 6:
+                        break;
+                    case 7:
                     default:
                         break;
                 }
@@ -95,30 +97,7 @@ try
             Console.ReadKey();
             continue;
         }
-        // InfoUser(connection);
-        // Menu(menu);
-        // Console.Write("Pilih Menu : ");
-        // menu = Convert.ToInt32(Console.ReadLine());
-        // switch (menu)
-        // {
-        //     case 1:
-        //         RiwayatTransaksi(connection);
-        //         break;
-        //     case 2:
-        //         MenuTambah(connection);
-        //         break;
-        //     case 3:
-        //         HapusTransaksi(connection);
-        //         break;
-        //     case 4:
-        //         CariTransaksi(connection);
-        //         break;
-        //     case 5:
-        //         break;
-        //     case 6:
-        //     default:
-        //         break;
-        // }
+        
     }
 }
 catch (Exception ex)
@@ -129,6 +108,8 @@ finally
 {
     connection.Close();
 }
+
+
 
 static void HeadLogo()
 {
@@ -155,6 +136,8 @@ Hi!, wellcome to Mangan Bata!
 ");
 }
 
+
+
 static void ProfileLogo()
 {
     Console.ForegroundColor = ConsoleColor.Yellow;
@@ -180,6 +163,8 @@ static void ProfileLogo()
 ");
 }
 
+
+
 static void Menu(int menu)
 {
     Console.ForegroundColor = ConsoleColor.White;
@@ -193,6 +178,8 @@ static void Menu(int menu)
 ");
 
 }
+
+
 
 static void InfoUser(MySqlConnection connection, string mail)
 {
@@ -211,6 +198,8 @@ static void InfoUser(MySqlConnection connection, string mail)
 
     reader.Close();
 }
+
+
 
 static void RiwayatTransaksi(MySqlConnection connection, string mail)
 {
@@ -251,6 +240,8 @@ ID: {reader["id_transaksi"]}
     Console.ReadKey();
 }
 
+
+
 static void MenuTambah(MySqlConnection connection, string mail)
 {
     Console.Clear();
@@ -275,6 +266,8 @@ Pilih Menu : ");
     }
 }
 
+
+
 static void TambahPemasukkan(MySqlConnection connection, string mail)
 {
     Console.Clear();
@@ -298,6 +291,8 @@ static void TambahPemasukkan(MySqlConnection connection, string mail)
 Press any key to continue ...");
     Console.ReadKey();
 }
+
+
 
 static void TambahPengeluaran(MySqlConnection connection, string mail)
 {
@@ -338,6 +333,8 @@ static void HapusTransaksi(MySqlConnection connection, string mail)
     Console.ReadKey();
 }
 
+
+
 static void CariTransaksi(MySqlConnection connection, string mail)
 {
     Console.Clear();
@@ -366,6 +363,8 @@ ID : {reader["id_transaksi"]}
     Console.ReadKey();
 }
 
+
+
 static void Profile(MySqlConnection connection, string connectionString, string mail)
 {
     Console.Clear();
@@ -393,6 +392,8 @@ Pilih Menu : ");
     }
 
 }
+
+
 
 static void EditProfile(MySqlConnection connection, string connectionString, string mail)
 {
@@ -427,9 +428,11 @@ Data Berhasil Di Edit Silahkan Muat Ulang Aplikasi
     }
 }
 
+
+
 static void HapusAkun(MySqlConnection connection, string connectionString, string mail)
 {
-    Console.WriteLine(@"Hapus Akun
+    Console.Write(@"Hapus Akun
 
 Anda Yakin Ingin Menghapus Akun Ini ? (y/n)");
     string? jawab = Console.ReadLine();
@@ -462,6 +465,8 @@ Anda Yakin Ingin Menghapus Akun Ini ? (y/n)");
         Console.ReadKey();
     }
 }
+
+
 
 static string Login(string connectionString)
 {
