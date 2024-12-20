@@ -71,15 +71,16 @@ try
                         RiwayatTransaksi(connection, mail);
                         break;
                     case 2:
-                        MenuTambah(connection);
+                        MenuTambah(connection, mail);
                         break;
                     case 3:
-                        HapusTransaksi(connection);
+                        HapusTransaksi(connection, mail);
                         break;
                     case 4:
-                        CariTransaksi(connection);
+                        CariTransaksi(connection, mail);
                         break;
                     case 5:
+                        Profile(connection, connectionString, mail);
                         break;
                     case 6:
                     default:
@@ -156,6 +157,7 @@ Hi!, wellcome to Mangan Bata!
 
 static void ProfileLogo()
 {
+    Console.ForegroundColor = ConsoleColor.Yellow;
     Console.WriteLine(@"
 ======= Your Profile =======
 
@@ -249,7 +251,7 @@ ID: {reader["id_transaksi"]}
     Console.ReadKey();
 }
 
-static void MenuTambah(MySqlConnection connection)
+static void MenuTambah(MySqlConnection connection, string mail)
 {
     Console.Clear();
     Console.Write(@"
@@ -262,10 +264,10 @@ Pilih Menu : ");
     switch (menu)
     {
         case 1:
-            TambahPemasukkan(connection);
+            TambahPemasukkan(connection, mail);
             break;
         case 2:
-            TambahPengeluaran(connection);
+            TambahPengeluaran(connection, mail);
             break;
         case 3:
         default:
@@ -273,7 +275,7 @@ Pilih Menu : ");
     }
 }
 
-static void TambahPemasukkan(MySqlConnection connection)
+static void TambahPemasukkan(MySqlConnection connection, string mail)
 {
     Console.Clear();
     DateTime now = DateTime.Now;
@@ -285,8 +287,8 @@ static void TambahPemasukkan(MySqlConnection connection)
     string? jumlah = Console.ReadLine();
     Console.Write("Keterangan : ");
     string? keterangan = Console.ReadLine();
-    string query = $"INSERT INTO transaksi (jenis_transaksi, saldo_transaksi, keterangan_transaksi, tanggal_transaksi, email_user) VALUES ('+ (pemasukkan)', '{jumlah}', '{keterangan}', '{now}', 'adli@gmail.com')";
-    string queryUpdateUser = $"UPDATE user SET saldo_user = saldo_user + {jumlah} WHERE email_user = 'adli@gmail.com'";
+    string query = $"INSERT INTO transaksi (jenis_transaksi, saldo_transaksi, keterangan_transaksi, tanggal_transaksi, email_user) VALUES ('+ (pemasukkan)', '{jumlah}', '{keterangan}', '{now}', '{mail}')";
+    string queryUpdateUser = $"UPDATE user SET saldo_user = saldo_user + {jumlah} WHERE email_user = '{mail}'";
     MySqlCommand updateUser = new MySqlCommand(queryUpdateUser, connection);
     updateUser.ExecuteNonQuery();
     MySqlCommand cmd = new MySqlCommand(query, connection);
@@ -297,7 +299,7 @@ Press any key to continue ...");
     Console.ReadKey();
 }
 
-static void TambahPengeluaran(MySqlConnection connection)
+static void TambahPengeluaran(MySqlConnection connection, string mail)
 {
     Console.Clear();
     DateTime now = DateTime.Now;
@@ -309,8 +311,8 @@ static void TambahPengeluaran(MySqlConnection connection)
     string? jumlah = Console.ReadLine();
     Console.Write("Keterangan : ");
     string? keterangan = Console.ReadLine();
-    string query = $"INSERT INTO transaksi (jenis_transaksi, saldo_transaksi, keterangan_transaksi, tanggal_transaksi, email_user) VALUES ('- (pengeluaran)', '{jumlah}', '{keterangan}', '{now}', 'adli@gmail.com')";
-    string queryUpdateUser = $"UPDATE user SET saldo_user = saldo_user - {jumlah} WHERE email_user = 'adli@gmail.com'";
+    string query = $"INSERT INTO transaksi (jenis_transaksi, saldo_transaksi, keterangan_transaksi, tanggal_transaksi, email_user) VALUES ('- (pengeluaran)', '{jumlah}', '{keterangan}', '{now}', '{mail}')";
+    string queryUpdateUser = $"UPDATE user SET saldo_user = saldo_user - {jumlah} WHERE email_user = '{mail}'";
     MySqlCommand updateUser = new MySqlCommand(queryUpdateUser, connection);
     updateUser.ExecuteNonQuery();
     MySqlCommand cmd = new MySqlCommand(query, connection);
@@ -321,14 +323,14 @@ Press any key to continue ...");
     Console.ReadKey();
 }
 
-static void HapusTransaksi(MySqlConnection connection)
+static void HapusTransaksi(MySqlConnection connection, string mail)
 {
     Console.Clear();
     Console.WriteLine(@"Hapus Transaksi
 ");
     Console.Write("ID : ");
     int id = Convert.ToInt32(Console.ReadLine());
-    string query = $"DELETE FROM transaksi WHERE id_transaksi = {id}";
+    string query = $"DELETE FROM transaksi WHERE id_transaksi = {id} AND email_user = '{mail}'";
     MySqlCommand cmd = new MySqlCommand(query, connection);
     cmd.ExecuteNonQuery();
     Console.WriteLine("Data Berhasil Di Hapus");
@@ -336,14 +338,14 @@ static void HapusTransaksi(MySqlConnection connection)
     Console.ReadKey();
 }
 
-static void CariTransaksi(MySqlConnection connection)
+static void CariTransaksi(MySqlConnection connection, string mail)
 {
     Console.Clear();
     Console.WriteLine(@"Cari Transaksi
 ");
     Console.Write("cari : ");
     string? cari = Console.ReadLine();
-    string query = $"SELECT * FROM transaksi WHERE keterangan_transaksi LIKE '%{cari}%'";
+    string query = $"SELECT * FROM transaksi WHERE keterangan_transaksi LIKE '%{cari}%' AND email_user = '{mail}'";
     MySqlCommand cmd = new MySqlCommand(query, connection);
     MySqlDataReader reader = cmd.ExecuteReader();
     Console.WriteLine(@$"
@@ -362,6 +364,103 @@ ID : {reader["id_transaksi"]}
     reader.Close();
     Console.WriteLine("Press any key to continue ...");
     Console.ReadKey();
+}
+
+static void Profile(MySqlConnection connection, string connectionString, string mail)
+{
+    Console.Clear();
+    ProfileLogo();
+    InfoUser(connection, mail);
+    Console.ForegroundColor = ConsoleColor.White;
+    Console.Write(@"
+1. Edit Profile
+2. Hapus Akun
+3. Kembali
+
+Pilih Menu : ");
+    int menu = Convert.ToInt32(Console.ReadLine());
+    switch (menu)
+    {
+        case 1:
+            EditProfile(connection, connectionString, mail);
+            break;
+        case 2:
+            HapusAkun(connection, connectionString, mail);
+            break;
+        case 3:
+        default:
+            break;
+    }
+
+}
+
+static void EditProfile(MySqlConnection connection, string connectionString, string mail)
+{
+    Console.WriteLine(@"===== Edit Profile =====
+");
+    Console.Write("New Name : ");
+    string? name = Console.ReadLine();
+    Console.Write("New Email : ");
+    string? newEmail = Console.ReadLine();
+
+    string email = Login(connectionString);
+    if (email == mail)
+    {
+        string query = $"UPDATE user SET name_user = '{name}', email_user = '{newEmail}' WHERE email_user = '{mail}'";
+        string queryTransaksi = $"UPDATE transaksi SET email_user = '{newEmail}' WHERE email_user = '{mail}'";
+        MySqlCommand cmdTransaksi = new MySqlCommand(queryTransaksi, connection);
+        cmdTransaksi.ExecuteNonQuery();
+        MySqlCommand cmd = new MySqlCommand(query, connection);
+        cmd.ExecuteNonQuery();
+        Console.WriteLine(@"
+Data Berhasil Di Edit Silahkan Muat Ulang Aplikasi
+");
+        Console.WriteLine("Press any key to continue ...");
+        Console.ReadKey();
+        Environment.Exit(0);
+    }
+    else
+    {
+        Console.WriteLine("Password Salah");
+        Console.WriteLine("Press any key to continue ...");
+        Console.ReadKey();
+    }
+}
+
+static void HapusAkun(MySqlConnection connection, string connectionString, string mail)
+{
+    Console.WriteLine(@"Hapus Akun
+
+Anda Yakin Ingin Menghapus Akun Ini ? (y/n)");
+    string? jawab = Console.ReadLine();
+    if (jawab == "y")
+    {
+        string oldMail = Login(connectionString);
+        if (oldMail == mail)
+        {
+            string query = $"DELETE FROM user WHERE email_user = '{mail}'";
+            string queryTransaksi = $"DELETE FROM transaksi WHERE email_user = '{mail}'";
+            MySqlCommand cmdTransaksi = new MySqlCommand(queryTransaksi, connection);
+            cmdTransaksi.ExecuteNonQuery();
+            MySqlCommand cmd = new MySqlCommand(query, connection);
+            cmd.ExecuteNonQuery();
+            Console.WriteLine("Akun Berhasil Di Hapus :)");
+            Console.WriteLine("Press any key to continue ...");
+            Console.ReadKey();
+            Environment.Exit(0);
+        }
+        else
+        {
+            Console.WriteLine("Password Salah");
+            Console.WriteLine("Press any key to continue ...");
+            Console.ReadKey();
+        }
+    }
+    else
+    {
+        Console.WriteLine("Press any key to continue ...");
+        Console.ReadKey();
+    }
 }
 
 static string Login(string connectionString)
