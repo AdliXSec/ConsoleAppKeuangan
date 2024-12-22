@@ -97,7 +97,7 @@ try
             Console.ReadKey();
             continue;
         }
-        
+
     }
 }
 catch (Exception ex)
@@ -494,4 +494,36 @@ static string Login(string connectionString)
     //     Console.WriteLine("Press any key to continue ...");
     //     Console.ReadKey();
     // }
+}
+
+static void Register(string connectionString)
+{
+    Console.Clear();
+    Console.WriteLine(@"=== Register User ===
+    ");
+    MySqlConnection connection = new MySqlConnection(connectionString);
+    connection.Open();
+    Console.Write("Name : ");
+    string? name = Console.ReadLine();
+    Console.Write("Email : ");
+    string? email = Console.ReadLine();
+    Console.Write("Password : ");
+    string? password = Console.ReadLine();
+    Console.WriteLine("Ulang Password : ");
+    string? ulangPassword = Console.ReadLine();
+    if (password != ulangPassword)
+    {
+        Console.WriteLine("Password Tidak Sama");
+        Console.WriteLine("Press any key to continue ...");
+        Console.ReadKey();
+    }
+    else
+    {
+        string query = $"INSERT INTO user (name_user, email_user, password_user) VALUES ('{name}', '{email}', '{password}')";
+        MySqlCommand cmd = new MySqlCommand(query, connection);
+        cmd.ExecuteNonQuery();
+        Console.WriteLine("Data Berhasil Di Tambah");
+        Console.WriteLine("Press any key to continue ...");
+        Console.ReadKey();
+    }
 }
