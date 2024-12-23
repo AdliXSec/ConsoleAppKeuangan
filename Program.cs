@@ -53,60 +53,74 @@ try
     {
         Console.Clear();
         HeadLogo();
-        string? mail = Login(connectionString);
-        // Console.WriteLine(mail);
-        if (mail != "0")
+        Console.ForegroundColor = ConsoleColor.White;
+        Console.Write(@"
+1. Login
+2. Register
+3. Exit
+        
+Pilih Menu : ");
+        string? auth = Console.ReadLine();
+        if (auth == "1")
         {
-            while (menu != 6)
+            string? mail = Login(connectionString);
+            // Console.WriteLine(mail);
+            if (mail != "0")
             {
-                Console.Clear();
-                HeadLogo();
-                InfoUser(connection, mail);
-                Menu(menu);
-                Console.Write("Pilih Menu : ");
-                menu = Convert.ToInt32(Console.ReadLine());
-                switch (menu)
+                while (menu != 6)
                 {
-                    case 1:
-                        RiwayatTransaksi(connection, mail);
-                        break;
-                    case 2:
-                        MenuTambah(connection, mail);
-                        break;
-                    case 3:
-                        HapusTransaksi(connection, mail);
-                        break;
-                    case 4:
-                        CariTransaksi(connection, mail);
-                        break;
-                    case 5:
-                        Profile(connection, connectionString, mail);
-                        break;
-                    case 6:
-                        break;
-                    case 7:
-                    default:
-                        break;
+                    Console.Clear();
+                    HeadLogo();
+                    InfoUser(connection, mail);
+                    Menu(menu);
+                    Console.Write("Pilih Menu : ");
+                    menu = Convert.ToInt32(Console.ReadLine());
+                    switch (menu)
+                    {
+                        case 1:
+                            RiwayatTransaksi(connection, mail);
+                            break;
+                        case 2:
+                            MenuTambah(connection, mail);
+                            break;
+                        case 3:
+                            HapusTransaksi(connection, mail);
+                            break;
+                        case 4:
+                            CariTransaksi(connection, mail);
+                            break;
+                        case 5:
+                            Profile(connection, connectionString, mail);
+                            break;
+                        case 6:
+                            break;
+                        case 7:
+                        default:
+                            break;
+                    }
                 }
             }
+            else if (mail == "0")
+            {
+                Console.WriteLine("Login Gagal");
+                Console.WriteLine("Press any key to continue ...");
+                Console.ReadKey();
+                continue;
+            }
         }
-        else if (mail == "0")
+        else if (auth == "2")
         {
-            Console.WriteLine("Login Gagal");
-            Console.WriteLine("Press any key to continue ...");
-            Console.ReadKey();
-            continue;
+            Register(connectionString);
         }
-
+        else if (auth == "3")
+        {
+            break;
+        }
     }
 }
 catch (Exception ex)
 {
     Console.WriteLine(ex.Message);
-}
-finally
-{
-    connection.Close();
 }
 
 
@@ -191,6 +205,8 @@ static void InfoUser(MySqlConnection connection, string mail)
 
     Console.ForegroundColor = ConsoleColor.Blue;
     Console.WriteLine(@$"   {reader["name_user"]}");
+    Console.ForegroundColor = ConsoleColor.DarkRed;
+    Console.WriteLine(@$"   {reader["email_user"]}");
     Console.ForegroundColor = ConsoleColor.White;
     Console.Write("   Rp. ");
     Console.ForegroundColor = ConsoleColor.Green;
@@ -306,6 +322,21 @@ static void TambahPengeluaran(MySqlConnection connection, string mail)
     string? jumlah = Console.ReadLine();
     Console.Write("Keterangan : ");
     string? keterangan = Console.ReadLine();
+
+    string getSaldo = $"SELECT saldo_user FROM user WHERE email_user = '{mail}'";
+    MySqlCommand cmdSaldo = new MySqlCommand(getSaldo, connection);
+    MySqlDataReader reader = cmdSaldo.ExecuteReader();
+    reader.Read();
+    int saldo = Convert.ToInt32(reader["saldo_user"]);
+    reader.Close();
+    if (Convert.ToInt32(jumlah) > saldo)
+    {
+        Console.WriteLine("Saldo Tidak Mencukupi");
+        Console.WriteLine("Press any key to continue ...");
+        Console.ReadKey();
+        return;
+    }
+
     string query = $"INSERT INTO transaksi (jenis_transaksi, saldo_transaksi, keterangan_transaksi, tanggal_transaksi, email_user) VALUES ('- (pengeluaran)', '{jumlah}', '{keterangan}', '{now}', '{mail}')";
     string queryUpdateUser = $"UPDATE user SET saldo_user = saldo_user - {jumlah} WHERE email_user = '{mail}'";
     MySqlCommand updateUser = new MySqlCommand(queryUpdateUser, connection);
@@ -317,6 +348,8 @@ static void TambahPengeluaran(MySqlConnection connection, string mail)
 Press any key to continue ...");
     Console.ReadKey();
 }
+
+
 
 static void HapusTransaksi(MySqlConnection connection, string mail)
 {
@@ -471,7 +504,9 @@ Anda Yakin Ingin Menghapus Akun Ini ? (y/n)");
 static string Login(string connectionString)
 {
     Console.ForegroundColor = ConsoleColor.White;
-    Console.WriteLine(@"=== Login User ===
+    Console.WriteLine(@"
+
+=== Login User ===
     ");
     MySqlConnection connection = new MySqlConnection(connectionString);
     connection.Open();
@@ -498,8 +533,9 @@ static string Login(string connectionString)
 
 static void Register(string connectionString)
 {
-    Console.Clear();
-    Console.WriteLine(@"=== Register User ===
+    Console.WriteLine(@"
+    
+=== Register User ===
     ");
     MySqlConnection connection = new MySqlConnection(connectionString);
     connection.Open();
@@ -509,7 +545,7 @@ static void Register(string connectionString)
     string? email = Console.ReadLine();
     Console.Write("Password : ");
     string? password = Console.ReadLine();
-    Console.WriteLine("Ulang Password : ");
+    Console.Write("Ulang Password : ");
     string? ulangPassword = Console.ReadLine();
     if (password != ulangPassword)
     {
@@ -519,7 +555,7 @@ static void Register(string connectionString)
     }
     else
     {
-        string query = $"INSERT INTO user (name_user, email_user, password_user) VALUES ('{name}', '{email}', '{password}')";
+        string query = $"INSERT INTO user (name_user, email_user, password_user, saldo_user) VALUES ('{name}', '{email}', '{password}', '0')";
         MySqlCommand cmd = new MySqlCommand(query, connection);
         cmd.ExecuteNonQuery();
         Console.WriteLine("Data Berhasil Di Tambah");
