@@ -67,7 +67,7 @@ Pilih Menu : ");
             // Console.WriteLine(mail);
             if (mail != "0")
             {
-                while (menu != 6)
+                while (menu != 7)
                 {
                     Console.Clear();
                     HeadLogo();
@@ -93,6 +93,7 @@ Pilih Menu : ");
                             Profile(connection, connectionString, mail);
                             break;
                         case 6:
+                            Catatan(connection, mail);
                             break;
                         case 7:
                         default:
@@ -188,7 +189,8 @@ static void Menu(int menu)
 3. Hapus Transaksi
 4. Cari Transaksi
 5. Profile
-6. Keluar
+6. Catatan
+7. Keluar
 ");
 
 }
@@ -501,6 +503,108 @@ Anda Yakin Ingin Menghapus Akun Ini ? (y/n)");
 
 
 
+static void Catatan(MySqlConnection connection, string mail)
+{
+    Console.Clear();
+    Console.Write(@"
+==== Catatan ====
+
+1. Lihat Catatan
+2. Tambah Catatan
+3. Hapus Catatan
+4. Kembali
+
+Pilih Menu : ");
+    int menuCatatan = Convert.ToInt32(Console.ReadLine());
+    switch (menuCatatan)
+    {
+        case 1:
+            LihatCatatan(connection, mail);
+            break;
+        case 2:
+            TambahCatatan(connection, mail);
+            break;
+        case 3:
+            HapusCatatan(connection, mail);
+            break;
+        case 4:
+        default:
+            break;
+    }
+}
+
+
+
+static void LihatCatatan(MySqlConnection connection, string mail)
+{
+    Console.Clear();
+    Console.WriteLine(@"
+=== Catatan ===
+");
+    string query = $"SELECT * FROM catatan WHERE email_user = '{mail}'";
+    MySqlCommand cmd = new MySqlCommand(query, connection);
+    MySqlDataReader reader = cmd.ExecuteReader();
+    while (reader.Read())
+    {
+        Console.ForegroundColor = ConsoleColor.Blue;
+        Console.WriteLine(@$"
+{reader["judul_catatan"]}");
+        Console.ForegroundColor = ConsoleColor.White;
+        Console.WriteLine(@$"
+{reader["deskripsi_catatan"]}
+
+{reader["tanggal_catatan"]}
+ID : {reader["id_catatan"]}
+==========================
+");
+    }
+    reader.Close();
+    Console.WriteLine("Press any key to continue ...");
+    Console.ReadKey();
+}
+
+
+
+static void TambahCatatan(MySqlConnection connection, string mail)
+{
+    Console.Clear();
+    Console.WriteLine(@"
+=== Tambah Catatan ===
+");
+    string date = DateTime.Now.ToString("yyyy-MM-dd");
+    Console.Write("Judul : ");
+    string? judul = Console.ReadLine();
+    Console.Write("Deskripsi : ");
+    string? deskripsi = Console.ReadLine();
+    string query = $"INSERT INTO catatan (judul_catatan, deskripsi_catatan, tanggal_catatan, email_user) VALUES ('{judul}', '{deskripsi}', '{date}', '{mail}')";
+    MySqlCommand cmd = new MySqlCommand(query, connection);
+    cmd.ExecuteNonQuery();
+    Console.WriteLine("Data Berhasil Di Tambahkan");
+    Console.WriteLine("Press any key to continue ...");
+    Console.ReadKey();
+}
+
+
+
+static void HapusCatatan(MySqlConnection connection, string mail)
+{
+    Console.Clear();
+    Console.WriteLine(@"
+=== Hapus Catatan ===
+");
+    // LihatCatatan(connection, mail);
+    Console.Write("ID Catatan : ");
+    string? id = Console.ReadLine();
+    string query = $"DELETE FROM catatan WHERE id_catatan = '{id}'";
+    MySqlCommand cmd = new MySqlCommand(query, connection);
+    cmd.ExecuteNonQuery();
+    Console.WriteLine("Data Berhasil Di Hapus");
+    Console.WriteLine("Press any key to continue ...");
+    Console.ReadKey();
+}
+
+
+
 static string Login(string connectionString)
 {
     Console.ForegroundColor = ConsoleColor.White;
@@ -530,6 +634,8 @@ static string Login(string connectionString)
     //     Console.ReadKey();
     // }
 }
+
+
 
 static void Register(string connectionString)
 {
