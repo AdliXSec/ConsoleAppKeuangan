@@ -67,7 +67,7 @@ Pilih Menu : ");
             // Console.WriteLine(mail);
             if (mail != "0")
             {
-                while (menu != 7)
+                while (menu != 8)
                 {
                     Console.Clear();
                     HeadLogo();
@@ -96,6 +96,9 @@ Pilih Menu : ");
                             Catatan(connection, mail);
                             break;
                         case 7:
+                            TargetMenabung(connection, mail);
+                            break;
+                        case 8:
                         default:
                             break;
                     }
@@ -190,7 +193,8 @@ static void Menu(int menu)
 4. Cari Transaksi
 5. Profile
 6. Catatan
-7. Keluar
+7. Target Menabung
+8. Keluar
 ");
 
 }
@@ -213,6 +217,26 @@ static void InfoUser(MySqlConnection connection, string mail)
     Console.Write("   Rp. ");
     Console.ForegroundColor = ConsoleColor.Green;
     Console.WriteLine(@$"{reader["saldo_user"]}");
+
+    if (Convert.ToInt32(reader["target_user"]) > 0)
+    {
+        Console.ForegroundColor = ConsoleColor.White;
+        Console.Write(@"
+Target Menabung :");
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.Write(@$" Rp. {reader["target_user"]}
+");
+        if (Convert.ToInt32(reader["saldo_user"]) < Convert.ToInt32(reader["target_user"]))
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("(Target Kamu Belum Tercapai kurang dari Rp. " + (Convert.ToInt32(reader["target_user"]) - Convert.ToInt32(reader["saldo_user"])) + ")");
+        }
+        else
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("(Target Kamu Sudah Tercapai)");
+        }
+    }
 
     reader.Close();
 }
@@ -605,6 +629,31 @@ static void HapusCatatan(MySqlConnection connection, string mail)
 
 
 
+static void TargetMenabung(MySqlConnection connection, string mail)
+{
+    Console.Clear();
+    string getTarget = $"SELECT target_user FROM user WHERE email_user = '{mail}'";
+    MySqlCommand cmdTarget = new MySqlCommand(getTarget, connection);
+    MySqlDataReader readerTarget = cmdTarget.ExecuteReader();
+    readerTarget.Read();
+    Console.WriteLine(@$"
+Target Menabung Kamu : Rp. {readerTarget["target_user"]}
+
+=== Target Menabung ===
+");
+    Console.Write("Ubah Target : ");
+    string? target = Console.ReadLine();
+    readerTarget.Close();
+    string query = $"UPDATE user SET target_user = '{target}' WHERE email_user = '{mail}'";
+    MySqlCommand cmd = new MySqlCommand(query, connection);
+    cmd.ExecuteNonQuery();
+    Console.WriteLine("Target Berhasil Di Ubah");
+    Console.WriteLine("Press any key to continue ...");
+    Console.ReadKey();
+}
+
+
+
 static string Login(string connectionString)
 {
     Console.ForegroundColor = ConsoleColor.White;
@@ -661,7 +710,7 @@ static void Register(string connectionString)
     }
     else
     {
-        string query = $"INSERT INTO user (name_user, email_user, password_user, saldo_user) VALUES ('{name}', '{email}', '{password}', '0')";
+        string query = $"INSERT INTO user (name_user, email_user, password_user, saldo_user, target_user) VALUES ('{name}', '{email}', '{password}', '0', '0')";
         MySqlCommand cmd = new MySqlCommand(query, connection);
         cmd.ExecuteNonQuery();
         Console.WriteLine("Data Berhasil Di Tambah");
