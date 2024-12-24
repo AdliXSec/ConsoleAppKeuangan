@@ -7,14 +7,7 @@
 // 4. Ida Bagus Giri Krisnabhawa (102062400117)
 // 5. Bagus Ardin Prayoga (102062400064)
 
-using Microsoft.VisualBasic;
 using MySql.Data.MySqlClient;
-using Org.BouncyCastle.Asn1.Cmp;
-using Org.BouncyCastle.Asn1.Misc;
-using Org.BouncyCastle.Security;
-using System.Net.NetworkInformation;
-using System.Security.Cryptography;
-using System.Text;
 
 string host, db, user, pass;
 
@@ -72,7 +65,7 @@ Pilih Menu : ");
                     Console.Clear();
                     HeadLogo();
                     InfoUser(connection, mail);
-                    Menu(menu);
+                    Menu();
                     Console.Write("Pilih Menu : ");
                     menu = Convert.ToInt32(Console.ReadLine());
                     switch (menu)
@@ -124,7 +117,7 @@ Pilih Menu : ");
 }
 catch (Exception ex)
 {
-    Console.WriteLine(ex.Message);
+    Console.WriteLine($"Terjadi kesalahan: {ex.Message}");
 }
 
 
@@ -183,7 +176,7 @@ static void ProfileLogo()
 
 
 
-static void Menu(int menu)
+static void Menu()
 {
     Console.ForegroundColor = ConsoleColor.White;
     Console.WriteLine(@$"
@@ -246,6 +239,117 @@ Target Menabung :");
 static void RiwayatTransaksi(MySqlConnection connection, string mail)
 {
     Console.Clear();
+    Console.WriteLine(@"
+=== Riwayat Transaksi ===
+
+1. Semua Transaksi
+2. Pemasukkan
+3. Pengeluaran
+4. Kembali
+");
+    Console.Write("Pilih Menu : ");
+    int menu = Convert.ToInt32(Console.ReadLine());
+    switch (menu)
+    {
+        case 1:
+            TampilRiwayat(connection, mail);
+            break;
+        case 2:
+            TampilRiwayatPemasukkan(connection, mail);
+            break;
+        case 3:
+            TampilRiwayatPengeluaran(connection, mail);
+            break;
+        case 4:
+        default:
+            break;
+    }
+}
+
+
+
+static void TampilRiwayatPemasukkan(MySqlConnection connection, string mail)
+{
+    string query = $"SELECT * FROM transaksi WHERE email_user = '{mail}' AND jenis_transaksi = '+ (pemasukkan)'";
+    MySqlCommand cmd = new MySqlCommand(query, connection);
+    MySqlDataReader reader = cmd.ExecuteReader();
+    Console.WriteLine(@"
+=== Riwayat Transaksi  ===");
+    while (reader.Read())
+    {
+        if (reader["jenis_transaksi"].ToString() == "+ (pemasukkan)")
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+        }
+        else
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+        }
+        Console.Write(@$"
+{reader["jenis_transaksi"]}");
+        Console.ForegroundColor = ConsoleColor.White;
+        Console.WriteLine(@$" Rp. {reader["saldo_transaksi"]}
+{reader["tanggal_transaksi"]}");
+
+        Console.ForegroundColor = ConsoleColor.Blue;
+        Console.WriteLine(@$"
+    {reader["keterangan_transaksi"]}");
+
+        Console.ForegroundColor = ConsoleColor.White;
+        Console.WriteLine(@$"
+ID: {reader["id_transaksi"]}
+==========================");
+    }
+    Console.ForegroundColor = ConsoleColor.White;
+    reader.Close();
+    Console.WriteLine("Press any key to continue ...");
+    Console.ReadKey();
+}
+
+
+
+static void TampilRiwayatPengeluaran(MySqlConnection connection, string mail)
+{
+    string query = $"SELECT * FROM transaksi WHERE email_user = '{mail}' AND jenis_transaksi = '- (pengeluaran)'";
+    MySqlCommand cmd = new MySqlCommand(query, connection);
+    MySqlDataReader reader = cmd.ExecuteReader();
+    Console.WriteLine(@"
+=== Riwayat Transaksi  ===");
+    while (reader.Read())
+    {
+        if (reader["jenis_transaksi"].ToString() == "+ (pemasukkan)")
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+        }
+        else
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+        }
+        Console.Write(@$"
+{reader["jenis_transaksi"]}");
+        Console.ForegroundColor = ConsoleColor.White;
+        Console.WriteLine(@$" Rp. {reader["saldo_transaksi"]}
+{reader["tanggal_transaksi"]}");
+
+        Console.ForegroundColor = ConsoleColor.Blue;
+        Console.WriteLine(@$"
+    {reader["keterangan_transaksi"]}");
+
+        Console.ForegroundColor = ConsoleColor.White;
+        Console.WriteLine(@$"
+ID: {reader["id_transaksi"]}
+==========================");
+    }
+    Console.ForegroundColor = ConsoleColor.White;
+    reader.Close();
+    Console.WriteLine("Press any key to continue ...");
+    Console.ReadKey();
+}
+
+
+
+static void TampilRiwayat(MySqlConnection connection, string mail)
+{
     string query = $"SELECT * FROM transaksi WHERE email_user = '{mail}'";
     MySqlCommand cmd = new MySqlCommand(query, connection);
     MySqlDataReader reader = cmd.ExecuteReader();
@@ -549,7 +653,7 @@ Pilih Menu : ");
             TambahCatatan(connection, mail);
             break;
         case 3:
-            HapusCatatan(connection, mail);
+            HapusCatatan(connection);
             break;
         case 4:
         default:
@@ -610,7 +714,7 @@ static void TambahCatatan(MySqlConnection connection, string mail)
 
 
 
-static void HapusCatatan(MySqlConnection connection, string mail)
+static void HapusCatatan(MySqlConnection connection)
 {
     Console.Clear();
     Console.WriteLine(@"
@@ -675,6 +779,7 @@ static string Login(string connectionString)
         string mail = "" + reader["email_user"];
         return mail;
     }
+    reader.Close();
     return "0";
     // else
     // {
