@@ -572,6 +572,9 @@ static void EditProfile(MySqlConnection connection, string connectionString, str
     {
         string query = $"UPDATE user SET name_user = '{name}', email_user = '{newEmail}' WHERE email_user = '{mail}'";
         string queryTransaksi = $"UPDATE transaksi SET email_user = '{newEmail}' WHERE email_user = '{mail}'";
+        string queryCatatan = $"UPDATE catatan SET email_user = '{newEmail}' WHERE email_user = '{mail}'";
+        MySqlCommand cmdCatatan = new MySqlCommand(queryCatatan, connection);
+        cmdCatatan.ExecuteNonQuery();
         MySqlCommand cmdTransaksi = new MySqlCommand(queryTransaksi, connection);
         cmdTransaksi.ExecuteNonQuery();
         MySqlCommand cmd = new MySqlCommand(query, connection);
